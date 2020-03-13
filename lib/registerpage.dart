@@ -6,7 +6,8 @@ class RegisterPage  extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  List<Step> steps = [
+  List<Step> _mySteps(){ 
+   List<Step> _steps = [
     Step(
       title: const Text(
         'Enter Name',
@@ -16,7 +17,7 @@ class _RegisterPageState extends State<RegisterPage> {
           fontWeight: FontWeight.bold
           ),
         ),
-      isActive: true,
+      isActive: _currentStep >=0,
       state: StepState.complete,
       content: Column(
         children: <Widget>[
@@ -43,7 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
           fontWeight: FontWeight.bold
           ),
         ),
-      isActive: false,
+      isActive: _currentStep >=1,
       state: StepState.complete,
       content: Column(
         children: <Widget>[
@@ -70,7 +71,7 @@ class _RegisterPageState extends State<RegisterPage> {
           fontWeight: FontWeight.bold
           ),
         ),
-      isActive: false,
+      isActive: _currentStep >=2,
       state: StepState.complete,
       content: Column(
         children: <Widget>[
@@ -97,7 +98,7 @@ class _RegisterPageState extends State<RegisterPage> {
           fontWeight: FontWeight.bold
           ),
         ),
-      isActive:false,
+      isActive: _currentStep >=3,
       state: StepState.complete,
       content: Column(
         children: <Widget>[
@@ -124,7 +125,7 @@ class _RegisterPageState extends State<RegisterPage> {
           fontWeight: FontWeight.bold
           ),
         ),
-      isActive: false,
+      isActive: _currentStep >=4,
       state: StepState.complete,
       content: Column(
         children: <Widget>[
@@ -145,24 +146,10 @@ class _RegisterPageState extends State<RegisterPage> {
     
 
   ];
-   int currentStep = 0;
-    bool complete= false;
-
-    next() {
-      currentStep + 1 != steps.length
-      ? goTo(currentStep + 1)
-      : setState(() => complete = true);
-
-    }
-    cancel() {
-      if(currentStep > 0) {
-        goTo(currentStep - 1);
-      }
-    }
-
-    goTo( int step) {
-      setState(() => complete = true);
-    }
+  return _steps;
+  }
+   int _currentStep = 0;
+   
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -178,20 +165,47 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         
       ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: Stepper(
-              steps: steps,
-              currentStep: currentStep,
-              onStepContinue: next,
-              onStepCancel: cancel,
-              onStepTapped: (step) => goTo(step)
-            ),
-            ),
-        ],
+      body:Theme(
+        data: ThemeData(
+         accentColor: Colors.green
+        ),
+       child: Stepper(
+        steps: _mySteps(),
+        currentStep: this._currentStep,
+        onStepTapped: (step){
+          setState(() {
+            this._currentStep = step;
+
+          });
+        },
+        onStepContinue: (){
+          setState(() {
+             if(this._currentStep < this._mySteps().length - 1){
+              this._currentStep = this._currentStep + 1;
+            }else{
+              //Logic to check if everything is completed
+              print('Completed, check fields.');
+            }
+          });
+        },
+         onStepCancel: () {
+          setState(() {
+            if(this._currentStep > 0){
+              this._currentStep = this._currentStep - 1;
+            }else{
+              this._currentStep = 0;
+            }
+          });
+        },
+        ),
       ),
-      
+       floatingActionButton: FloatingActionButton(
+         onPressed: () {
+
+         },
+         child: Icon(Icons.check, color: Colors.black),
+         backgroundColor: Colors.tealAccent[400],
+         ),
     );
   }
 }
